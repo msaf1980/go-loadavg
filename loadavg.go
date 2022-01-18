@@ -5,6 +5,7 @@ package loadavg
 import (
 	"errors"
 	"io/ioutil"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -12,6 +13,15 @@ import (
 )
 
 func Parse() (la [3]float32, err error) {
+	switch runtime.GOOS {
+	case "linux":
+		return parse_linux()
+	default:
+		return [3]float32{0.0}, errors.New("loadavg unimplemented on " + runtime.GOOS)
+	}
+}
+
+func parse_linux() (la [3]float32, err error) {
 	raw, err := ioutil.ReadFile("/proc/loadavg")
 	if err != nil {
 		return la, err
