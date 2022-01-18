@@ -1,0 +1,12 @@
+container:
+  image: ubuntu:bionic
+
+task:
+  matrix:
+    - name: Test (Linux)
+      test_script: go test
+      container:
+        matrix:
+          - image: golang:1.17
+          - image: golang:1.16
+          - image: golang:1.14
