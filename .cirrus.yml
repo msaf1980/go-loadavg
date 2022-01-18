@@ -10,3 +10,12 @@ task:
           - image: golang:1.17
           - image: golang:1.16
           - image: golang:1.14
+    - name: Test (FreeBSD)
+      install_dependencies_script:
+        - wget https://go.dev/dl/go1.17.6.freebsd-amd64.tar.gz
+        - tar -xf go1.17.6.freebsd-amd64.tar.gz && mv go /usr/local
+      test_script: PATH=/usr/local/go/bin:${PATH} GOROOT=/usr/local/go go test
+      freebsd_instance:
+        matrix:
+          #- image: freebsd-12-1-release-amd64
+          - image: freebsd-11-4-release-amd64
