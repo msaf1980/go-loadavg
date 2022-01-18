@@ -1,5 +1,3 @@
-// +build !linux, !freebsd, !dragonfly, !netbsd, !openbsd, !darwin
-
 package loadavg
 
 import (

@@ -2,42 +2,23 @@
 
 package loadavg
 
+// #include <stdlib.h>
+import "C"
+
 import (
 	"errors"
-	"io/ioutil"
-	"strconv"
-	"strings"
-
-	"github.com/msaf1980/go-stringutils"
+	"syscall"
+	"time"
+	"unsafe"
 )
 
 func Parse() (la [3]float64, err error) {
-	raw, err := ioutil.ReadFile("/proc/loadavg")
-	if err != nil {
-		return la, err
-	}
+	avg := []C.double{0, 0, 0}
 
-	s := strings.TrimRight(stringutils.UnsafeString(raw), "\n")
-	buf := make([]string, 4)
-	values := stringutils.SplitN(s, " ", buf)
-	if len(values) != 4 {
-		return la, errors.New("/proc/loadavg field count mismatch")
-	}
+	n := C.getloadavg(&avg[0], C.int(len(avg)))
 
-	la[0], err = strconv.ParseFloat(values[0], 64)
-	if err != nil {
-		return la, errors.New("LoadAverage1 parse error")
+	if n == -1 {
+		return [3]float32{0, 0, 0}, errors.New("load average unavailable")
 	}
-
-	la[1], err = strconv.ParseFloat(values[1], 64)
-	if err != nil {
-		return la, errors.New("LoadAverage5 parse error")
-	}
-
-	la[2], err = strconv.ParseFloat(values[2], 64)
-	if err != nil {
-		return la, errors.New("LoadAverage10 parse error")
-	}
-
-	return la, nil
+	return [3]float32{float32(avg[0]), float32(avg[1]), float32(avg[2])}, nil
 }
